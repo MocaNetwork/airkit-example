@@ -27,7 +27,7 @@ export const mocaTestnet: Chain & { contracts: { multicall3: { address: `0x${str
   },
 } as const);
 
-export const BUILD_ENV = AIRKIT_BUILD_ENV.STAGING;
+export const BUILD_ENV = AIRKIT_BUILD_ENV.SANDBOX;
 export const DEFAULT_CHAIN = mocaTestnet;
 
 const ERC20_ADDRESSES: { [chainId: number]: Address } = {
