@@ -1,6 +1,7 @@
 import { useSignMessage } from "wagmi";
 import { Button } from "../common/Button";
 import { useLogging } from "../../hooks/useLogging";
+
 export const SigningFunctions = () => {
   const { signMessageAsync } = useSignMessage();
   const { setLog } = useLogging();
