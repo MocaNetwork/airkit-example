@@ -17,14 +17,12 @@ type AirkitHook =
 
 export const useAirkit = (): AirkitHook => {
   const config = useConfig();
-  const connector = useMemo(
-    () => config.connectors.find((connector) => connector.isMocaNetwork),
+  const airConnector = useMemo(
+    () => config.connectors.find((connector): connector is AirConnector => !!connector.isMocaNetwork),
     [config.connectors]
   );
 
-  if (connector?.isMocaNetwork) {
-    const airConnector = connector as AirConnector;
-
+  if (airConnector) {
     return {
       connector: airConnector,
       airService: airConnector.airService,
