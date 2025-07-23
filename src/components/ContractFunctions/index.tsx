@@ -1,6 +1,7 @@
 import { AccountFunctions } from "./AccountFunctions";
 import { ContractFunctions } from "./ContractFunctions";
 import { SigningFunctions } from "./SigningFunctions";
+import { ExperimentFunctions } from "./ExperimentFunctions";
 
 export const BlockchainFunctions = () => {
   return (
@@ -8,6 +9,7 @@ export const BlockchainFunctions = () => {
       <AccountFunctions />
       <SigningFunctions />
       <ContractFunctions />
+      <ExperimentFunctions />
     </div>
   );
 };

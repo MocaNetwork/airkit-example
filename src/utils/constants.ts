@@ -1,8 +1,11 @@
+import { BUILD_ENV as AIRKIT_BUILD_ENV } from "@mocanetwork/airkit";
 import { type Address, type Chain, defineChain } from "viem";
 import { baseSepolia, soneiumMinato } from "viem/chains";
-import { BUILD_ENV as AIRKIT_BUILD_ENV } from "@mocanetwork/airkit";
+import { abi as reclaimAbi } from "./reclaimAbi";
 
-export const mocaTestnet: Chain & { contracts: { multicall3: { address: `0x${string}`; blockCreated: number } } } = defineChain({
+export const mocaTestnet: Chain & {
+  contracts: { multicall3: { address: `0x${string}`; blockCreated: number } };
+} = defineChain({
   id: 5151,
   name: "Moca Testnet",
   nativeCurrency: {
@@ -27,20 +30,32 @@ export const mocaTestnet: Chain & { contracts: { multicall3: { address: `0x${str
   },
 } as const);
 
-export const BUILD_ENV = AIRKIT_BUILD_ENV.SANDBOX;
+export const BUILD_ENV = AIRKIT_BUILD_ENV.STAGING;
 export const DEFAULT_CHAIN = mocaTestnet;
 
 const ERC20_ADDRESSES: { [chainId: number]: Address } = {
   [baseSepolia.id]: "0xa807429271f7001ED6e5eB40e2029B7ecbA9445f",
   [soneiumMinato.id]: "0x15a2e33bf32563C796b5f85e77236e20C6D1b956",
-  [mocaTestnet.id]: "0xF025335C838738ba426ded3ABc8Ce36B871F5c0C"
+  [mocaTestnet.id]: "0xF025335C838738ba426ded3ABc8Ce36B871F5c0C",
 };
 
 const ERC721_ADDRESSES: { [chainId: number]: Address } = {
   [baseSepolia.id]: "0xc9061eEC6abEB13DC7815e47FFfe1b9a40A8088b",
   [soneiumMinato.id]: "0x51aeA0a26D84eCa3ADE38078b6eFDa5e04702607",
-  [mocaTestnet.id]: "0x6c513255C62D9036aFd14dA3633C4f2e4239adD1"
+  [mocaTestnet.id]: "0x6c513255C62D9036aFd14dA3633C4f2e4239adD1",
 };
+
+const RECLAIM_CONTRACT_ADDRESSES: { [chainId: number]: Address } = {
+  [baseSepolia.id]: "0xF90085f5Fd1a3bEb8678623409b3811eCeC5f6A5",
+  // [soneiumMinato.id]: "0x0000000000000000000000000000000000000000", // TODO: replace with actual address
+  // [mocaTestnet.id]: "0x0000000000000000000000000000000000000000", // TODO: replace with actual address
+};
+
+export const getReclaimContract = (chainId: number) => ({
+  address: RECLAIM_CONTRACT_ADDRESSES[chainId],
+  abi: reclaimAbi,
+  chainId,
+});
 
 export const MOCK_ERC20_CONTRACT = (chainId: number) => ({
   address: ERC20_ADDRESSES[chainId],
