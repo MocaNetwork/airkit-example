@@ -1,6 +1,6 @@
 import { multicall } from "@wagmi/core";
 import { useMemo, useState } from "react";
-import { encodeFunctionData, formatEther, parseAbi } from "viem";
+import { encodeFunctionData, formatEther, parseAbi, parseUnits } from "viem";
 import {
   useAccount,
   useChainId,
@@ -34,7 +34,7 @@ export const ContractFunctions = () => {
       encodeFunctionData({
         abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
         functionName: "transfer",
-        args: [address, "10"],
+        args: [address, parseUnits("10", 18)],
       }),
     [address, chainId]
   );
@@ -77,7 +77,7 @@ export const ContractFunctions = () => {
         address: MOCK_ERC20_CONTRACT(chainId).address,
         abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
         functionName: "mint",
-        args: [address, "10"],
+        args: [address, parseUnits("10", 18)],
       });
       setLog(`Minted token: ${result}`, "info");
     } catch (error) {
@@ -91,7 +91,7 @@ export const ContractFunctions = () => {
         address: MOCK_ERC20_CONTRACT(chainId).address,
         abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
         functionName: "transfer",
-        args: [address, "10"],
+        args: [address, parseUnits("10", 18)],
       });
       setLog(`Transferred token: ${result}`, "info");
     } catch (error) {
