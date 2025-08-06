@@ -14,12 +14,19 @@ import {
   MOCK_ERC721_CONTRACT,
 } from "../../utils/constants";
 import { Button } from "../common/Button";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export const ContractFunctions = () => {
   const { setLog } = useLogging();
   const { address } = useAccount();
   const config = useConfig();
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
+    {}
+  );
+
+  const setLoading = (key: string, loading: boolean) => {
+    setLoadingStates((prev) => ({ ...prev, [key]: loading }));
+  };
 
   const data = useMemo(
     () =>
@@ -92,12 +99,16 @@ export const ContractFunctions = () => {
   };
 
   const balanceOfTokenFn = async () => {
-    const { data: result } = await refetchErc20Balance();
-    if (typeof result !== "bigint") {
-      setLog("No balance of token", "info");
-      return;
+    try {
+      const { data: result } = await refetchErc20Balance();
+      if (typeof result !== "bigint") {
+        setLog("No balance of token", "info");
+        return;
+      }
+      setLog(`Balance of token: ${formatEther(result)}`, "info");
+    } catch (error) {
+      setLog(`Error getting balance: ${error}`, "error");
     }
-    setLog(`Balance of token: ${formatEther(result)}`, "info");
   };
 
   const mintMockERC721Fn = async () => {
@@ -115,12 +126,16 @@ export const ContractFunctions = () => {
   };
 
   const balanceOfERC721Fn = async () => {
-    const { data: result } = await refetchErc721Balance();
-    if (typeof result !== "bigint") {
-      setLog("No balance of token", "info");
-      return;
+    try {
+      const { data: result } = await refetchErc721Balance();
+      if (typeof result !== "bigint") {
+        setLog("No balance of token", "info");
+        return;
+      }
+      setLog(`Balance of token: ${result}`, "info");
+    } catch (error) {
+      setLog(`Error getting balance: ${error}`, "error");
     }
-    setLog(`Balance of token: ${result}`, "info");
   };
 
   const multicallFn = async () => {
@@ -147,7 +162,7 @@ export const ContractFunctions = () => {
     }
   };
 
-  const CONTRACT_FUNCTIONS: Record<string, () => void> = {
+  const CONTRACT_FUNCTIONS: Record<string, () => Promise<void> | void> = {
     "Estimate Gas (transfer)": estimateGasForTransferTokenFn,
     "mint (ERC20)": mintMockTokenFn,
     "transfer (ERC20)": transferTokenFn,
@@ -162,8 +177,20 @@ export const ContractFunctions = () => {
       <h2 className="text-2xl font-bold">Contract Functions</h2>
       <div className="grid grid-cols-2 gap-2">
         {Object.entries(CONTRACT_FUNCTIONS).map(([key, value]) => (
-          <Button key={key} onClick={value} variant="outline">
-            {key}
+          <Button
+            key={key}
+            onClick={async () => {
+              setLoading(key, true);
+              try {
+                await value();
+              } finally {
+                setLoading(key, false);
+              }
+            }}
+            variant="outline"
+            disabled={loadingStates[key]}
+          >
+            {loadingStates[key] ? "Loading..." : key}
           </Button>
         ))}
       </div>
