@@ -1,7 +1,9 @@
 import { multicall } from "@wagmi/core";
-import { encodeFunctionData, formatEther, parseAbi } from "viem";
+import { useMemo, useState } from "react";
+import { encodeFunctionData, formatEther, parseAbi, parseUnits } from "viem";
 import {
   useAccount,
+  useChainId,
   useConfig,
   useEstimateGas,
   useReadContract,
@@ -9,12 +11,10 @@ import {
 } from "wagmi";
 import { useLogging } from "../../hooks/useLogging";
 import {
-  DEFAULT_CHAIN,
   MOCK_ERC20_CONTRACT,
   MOCK_ERC721_CONTRACT,
 } from "../../utils/constants";
 import { Button } from "../common/Button";
-import { useMemo, useState } from "react";
 
 export const ContractFunctions = () => {
   const { setLog } = useLogging();
@@ -27,15 +27,16 @@ export const ContractFunctions = () => {
   const setLoading = (key: string, loading: boolean) => {
     setLoadingStates((prev) => ({ ...prev, [key]: loading }));
   };
+  const chainId = useChainId();
 
   const data = useMemo(
     () =>
       encodeFunctionData({
-        abi: parseAbi(MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).abi),
+        abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
         functionName: "transfer",
-        args: [address, "10"],
+        args: [address, parseUnits("10", 18)],
       }),
-    [address]
+    [address, chainId]
   );
 
   const { refetch: refetchGasEstimate } = useEstimateGas({
@@ -49,14 +50,14 @@ export const ContractFunctions = () => {
 
   const { writeContractAsync } = useWriteContract();
   const { refetch: refetchErc20Balance } = useReadContract({
-    address: MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).address,
-    abi: parseAbi(MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).abi),
+    address: MOCK_ERC20_CONTRACT(chainId).address,
+    abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
     functionName: "balanceOf",
     args: [address],
   });
   const { refetch: refetchErc721Balance } = useReadContract({
-    address: MOCK_ERC721_CONTRACT(DEFAULT_CHAIN.id).address,
-    abi: parseAbi(MOCK_ERC721_CONTRACT(DEFAULT_CHAIN.id).abi),
+    address: MOCK_ERC721_CONTRACT(chainId).address,
+    abi: parseAbi(MOCK_ERC721_CONTRACT(chainId).abi),
     functionName: "balanceOf",
     args: [address],
   });
@@ -73,10 +74,10 @@ export const ContractFunctions = () => {
   const mintMockTokenFn = async () => {
     try {
       const result = await writeContractAsync({
-        address: MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).address,
-        abi: parseAbi(MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).abi),
+        address: MOCK_ERC20_CONTRACT(chainId).address,
+        abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
         functionName: "mint",
-        args: [address, "10"],
+        args: [address, parseUnits("10", 18)],
       });
       setLog(`Minted token: ${result}`, "info");
     } catch (error) {
@@ -87,10 +88,10 @@ export const ContractFunctions = () => {
   const transferTokenFn = async () => {
     try {
       const result = await writeContractAsync({
-        address: MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).address,
-        abi: parseAbi(MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).abi),
+        address: MOCK_ERC20_CONTRACT(chainId).address,
+        abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
         functionName: "transfer",
-        args: [address, "10"],
+        args: [address, parseUnits("10", 18)],
       });
       setLog(`Transferred token: ${result}`, "info");
     } catch (error) {
@@ -114,8 +115,8 @@ export const ContractFunctions = () => {
   const mintMockERC721Fn = async () => {
     try {
       const result = await writeContractAsync({
-        address: MOCK_ERC721_CONTRACT(DEFAULT_CHAIN.id).address,
-        abi: parseAbi(MOCK_ERC721_CONTRACT(DEFAULT_CHAIN.id).abi),
+        address: MOCK_ERC721_CONTRACT(chainId).address,
+        abi: parseAbi(MOCK_ERC721_CONTRACT(chainId).abi),
         functionName: "safeMint",
         args: [address],
       });
@@ -143,14 +144,14 @@ export const ContractFunctions = () => {
       const result = await multicall(config, {
         contracts: [
           {
-            address: MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).address,
-            abi: parseAbi(MOCK_ERC20_CONTRACT(DEFAULT_CHAIN.id).abi),
+            address: MOCK_ERC20_CONTRACT(chainId).address,
+            abi: parseAbi(MOCK_ERC20_CONTRACT(chainId).abi),
             functionName: "balanceOf",
             args: [address!],
           },
           {
-            address: MOCK_ERC721_CONTRACT(DEFAULT_CHAIN.id).address,
-            abi: parseAbi(MOCK_ERC721_CONTRACT(DEFAULT_CHAIN.id).abi),
+            address: MOCK_ERC721_CONTRACT(chainId).address,
+            abi: parseAbi(MOCK_ERC721_CONTRACT(chainId).abi),
             functionName: "balanceOf",
             args: [address!],
           },

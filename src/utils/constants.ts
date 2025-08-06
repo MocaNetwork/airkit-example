@@ -1,8 +1,10 @@
+import { BUILD_ENV as AIRKIT_BUILD_ENV } from "@mocanetwork/airkit";
 import { type Address, type Chain, defineChain } from "viem";
 import { baseSepolia, soneiumMinato } from "viem/chains";
-import { BUILD_ENV as AIRKIT_BUILD_ENV } from "@mocanetwork/airkit";
 
-export const mocaTestnet: Chain & { contracts: { multicall3: { address: `0x${string}`; blockCreated: number } } } = defineChain({
+export const mocaTestnet: Chain & {
+  contracts: { multicall3: { address: `0x${string}`; blockCreated: number } };
+} = defineChain({
   id: 5151,
   name: "Moca Testnet",
   nativeCurrency: {
@@ -28,51 +30,64 @@ export const mocaTestnet: Chain & { contracts: { multicall3: { address: `0x${str
 } as const);
 
 export const BUILD_ENV = AIRKIT_BUILD_ENV.SANDBOX;
-export const DEFAULT_CHAIN = mocaTestnet;
 
 const ERC20_ADDRESSES: { [chainId: number]: Address } = {
   [baseSepolia.id]: "0xa807429271f7001ED6e5eB40e2029B7ecbA9445f",
   [soneiumMinato.id]: "0x15a2e33bf32563C796b5f85e77236e20C6D1b956",
-  [mocaTestnet.id]: "0xF025335C838738ba426ded3ABc8Ce36B871F5c0C"
+  [mocaTestnet.id]: "0xF025335C838738ba426ded3ABc8Ce36B871F5c0C",
 };
 
 const ERC721_ADDRESSES: { [chainId: number]: Address } = {
   [baseSepolia.id]: "0xc9061eEC6abEB13DC7815e47FFfe1b9a40A8088b",
   [soneiumMinato.id]: "0x51aeA0a26D84eCa3ADE38078b6eFDa5e04702607",
-  [mocaTestnet.id]: "0x6c513255C62D9036aFd14dA3633C4f2e4239adD1"
+  [mocaTestnet.id]: "0x6c513255C62D9036aFd14dA3633C4f2e4239adD1",
 };
 
-export const MOCK_ERC20_CONTRACT = (chainId: number) => ({
-  address: ERC20_ADDRESSES[chainId],
-  abi: [
-    "function balanceOf(address account) view returns (uint256)",
-    "function symbol() view returns (string)",
-    "function mint(address to, uint256 amount)",
-    "function transfer(address to, uint256 value)",
-    "error ERC20InsufficientBalance(address sender, uint256 balance, uint256 needed)",
-    "error ERC20InvalidSender(address sender)",
-    "error ERC20InvalidReceiver(address receiver)",
-    "error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed)",
-    "error ERC20InvalidApprover(address approver)",
-    "error ERC20InvalidSpender(address spender)",
-  ],
-  chainId: DEFAULT_CHAIN.id,
-});
+export const MOCK_ERC20_CONTRACT = (chainId: number) => {
+  const erc20Address = ERC20_ADDRESSES[chainId];
 
-export const MOCK_ERC721_CONTRACT = (chainId: number) => ({
-  address: ERC721_ADDRESSES[chainId],
-  abi: [
-    "function balanceOf(address account) view returns (uint256)",
-    "function safeMint(address to)",
-    "function transferFrom(address from, address to, uint256 tokenId)",
-    "error ERC721InvalidOwner(address owner)",
-    "error ERC721NonexistentToken(uint256 tokenId)",
-    "error ERC721IncorrectOwner(address sender, uint256 tokenId, address owner)",
-    "error ERC721InvalidSender(address sender)",
-    "error ERC721InvalidReceiver(address receiver)",
-    "error ERC721InsufficientApproval(address operator, uint256 tokenId)",
-    "error ERC721InvalidApprover(address approver)",
-    "error ERC721InvalidOperator(address operator)",
-  ],
-  chainId: DEFAULT_CHAIN.id,
-});
+  if (!erc20Address) {
+    throw new Error(`No erc20 address found for chainId: ${chainId}`);
+  }
+
+  return {
+    address: erc20Address,
+    abi: [
+      "function balanceOf(address account) view returns (uint256)",
+      "function symbol() view returns (string)",
+      "function mint(address to, uint256 amount)",
+      "function transfer(address to, uint256 value)",
+      "error ERC20InsufficientBalance(address sender, uint256 balance, uint256 needed)",
+      "error ERC20InvalidSender(address sender)",
+      "error ERC20InvalidReceiver(address receiver)",
+      "error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed)",
+      "error ERC20InvalidApprover(address approver)",
+      "error ERC20InvalidSpender(address spender)",
+    ],
+  };
+};
+
+export const MOCK_ERC721_CONTRACT = (chainId: number) => {
+  const erc721Address = ERC721_ADDRESSES[chainId];
+
+  if (!erc721Address) {
+    throw new Error(`No erc721 address found for chainId: ${chainId}`);
+  }
+
+  return {
+    address: erc721Address,
+    abi: [
+      "function balanceOf(address account) view returns (uint256)",
+      "function safeMint(address to)",
+      "function transferFrom(address from, address to, uint256 tokenId)",
+      "error ERC721InvalidOwner(address owner)",
+      "error ERC721NonexistentToken(uint256 tokenId)",
+      "error ERC721IncorrectOwner(address sender, uint256 tokenId, address owner)",
+      "error ERC721InvalidSender(address sender)",
+      "error ERC721InvalidReceiver(address receiver)",
+      "error ERC721InsufficientApproval(address operator, uint256 tokenId)",
+      "error ERC721InvalidApprover(address approver)",
+      "error ERC721InvalidOperator(address operator)",
+    ],
+  };
+};
