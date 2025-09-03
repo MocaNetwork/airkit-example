@@ -2,7 +2,7 @@ name: Build, Test and Deploy AIRKit Example Site
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "fix/skip-deploy-with-pr"]
   workflow_dispatch:
 
 concurrency:
@@ -68,8 +68,8 @@ jobs:
 
       - name: Sync S3
         run: |
-          aws s3 sync ./dist s3://${{ vars.AIR_EXAMPLE_BUCKET_NAME }}
+          aws s3 sync ./dist s3://${{ vars.AIR_EXAMPLE_BUCKET_NAME }}/airkit-example
 
       - name: Invalidate CloudFront cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ vars.AIR_EXAMPLE_CLOUDFRONT_DISTRIBUTION_ID }} --paths '/*'
+          aws cloudfront create-invalidation --distribution-id ${{ vars.AIR_EXAMPLE_CLOUDFRONT_DISTRIBUTION_ID }} --paths '/airkit-example/*'
